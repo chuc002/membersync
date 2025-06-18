@@ -63,7 +63,7 @@ A comprehensive club management system for Indian Hills Country Club (IHCC) feat
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/YOUR_USERNAME/membersync.git
+   git clone https://github.com/chuc002/membersync.git
    cd membersync
    ```
 
@@ -250,7 +250,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 For questions or support:
 - Create an issue in this repository
 - Email: support@membersync.app
-- Documentation: [GitHub Wiki](https://github.com/YOUR_USERNAME/membersync/wiki)
+- Documentation: [GitHub Wiki](https://github.com/chuc002/membersync/wiki)
 
 ## 🙏 Acknowledgments
 

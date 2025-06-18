@@ -31,7 +31,7 @@ After creating the GitHub repository, connect your local repository:
 
 ```bash
 # Add the GitHub repository as remote origin
-git remote add origin https://github.com/YOUR_USERNAME/membersync.git
+git remote add origin https://github.com/chuc002/membersync.git
 
 # Verify the remote was added
 git remote -v
@@ -111,7 +111,7 @@ railway up
 
 ```bash
 # Clone the repository
-git clone https://github.com/YOUR_USERNAME/membersync.git
+git clone https://github.com/chuc002/membersync.git
 cd membersync
 
 # Install dependencies
