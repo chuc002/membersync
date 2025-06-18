@@ -1,10 +1,10 @@
 'use client'
 
 import { useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
+import { MockAuthService, MockNotificationsService } from '@/lib/mock/services'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import type { FamilyMember } from '@/lib/types/database'
+import type { MockFamilyMember } from '@/lib/mock/data'
 
 export default function SignupPage() {
   const [email, setEmail] = useState('')
@@ -12,11 +12,10 @@ export default function SignupPage() {
   const [confirmPassword, setConfirmPassword] = useState('')
   const [fullName, setFullName] = useState('')
   const [phoneNumber, setPhoneNumber] = useState('')
-  const [familyMembers, setFamilyMembers] = useState<FamilyMember[]>([])
+  const [familyMembers, setFamilyMembers] = useState<MockFamilyMember[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const router = useRouter()
-  const supabase = createClient()
 
   const addFamilyMember = () => {
     setFamilyMembers([
@@ -33,7 +32,7 @@ export default function SignupPage() {
     ])
   }
 
-  const updateFamilyMember = (index: number, field: keyof FamilyMember, value: any) => {
+  const updateFamilyMember = (index: number, field: keyof MockFamilyMember, value: any) => {
     const updated = [...familyMembers]
     if (field === 'notificationPreferences') {
       updated[index] = { ...updated[index], [field]: { ...updated[index][field], ...value } }
@@ -72,47 +71,35 @@ export default function SignupPage() {
 
     try {
       // Sign up the user
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email,
-        password,
+      const { user, error: authError } = await MockAuthService.signUp(email, password, {
+        name: fullName,
+        phone: phoneNumber,
+        family_members: familyMembers,
+        preferences: {
+          categories: [],
+          notifications: {
+            email: true,
+            sms: false,
+            reminders: true,
+          },
+          familyEvents: true,
+        },
       })
 
       if (authError) {
-        setError(authError.message)
+        setError(authError)
         setLoading(false)
         return
       }
 
-      if (authData.user) {
-        // Create member profile
-        const { error: profileError } = await supabase
-          .from('members')
-          .insert({
-            id: authData.user.id,
-            email,
-            name: fullName,
-            phone: phoneNumber,
-            club_id: 'IHCC',
-            family_members: familyMembers,
-            preferences: {
-              categories: [],
-              notifications: {
-                email: true,
-                sms: false,
-                reminders: true,
-              },
-              familyEvents: true,
-            },
-          })
-
-        if (profileError) {
-          setError('Failed to create profile: ' + profileError.message)
-          setLoading(false)
-          return
-        }
-
-        router.push('/dashboard')
-        router.refresh()
+      if (user) {
+        // Send welcome email (mock)
+        await MockNotificationsService.sendWelcomeEmail(user)
+        
+        // Wait a bit for auth state to update, then redirect
+        setTimeout(() => {
+          window.location.href = '/dashboard'
+        }, 100)
       }
     } catch (err) {
       setError('An unexpected error occurred')

@@ -2,76 +2,65 @@
 
 import { useState, useEffect } from 'react'
 import { useAuth } from '@/components/AuthProvider'
-import { createClient } from '@/lib/supabase/client'
-import type { FamilyMember, Event, Registration } from '@/lib/types/database'
+import { useRouter } from 'next/navigation'
+import { MockAuthService, MockEventsService, MockRegistrationsService } from '@/lib/mock/services'
+import type { MockFamilyMember, MockEvent, MockRegistration } from '@/lib/mock/data'
 
 export default function FamilyPage() {
-  const { user, member, signOut } = useAuth()
-  const [familyMembers, setFamilyMembers] = useState<FamilyMember[]>([])
-  const [events, setEvents] = useState<Event[]>([])
-  const [familyRegistrations, setFamilyRegistrations] = useState<Registration[]>([])
-  const [loading, setLoading] = useState(true)
+  const { user, member, signOut, loading, isMember } = useAuth()
+  const router = useRouter()
+  const [familyMembers, setFamilyMembers] = useState<MockFamilyMember[]>([])
+  const [events, setEvents] = useState<MockEvent[]>([])
+  const [familyRegistrations, setFamilyRegistrations] = useState<MockRegistration[]>([])
+  const [pageLoading, setPageLoading] = useState(true)
   const [editingMember, setEditingMember] = useState<number | null>(null)
   const [showAddForm, setShowAddForm] = useState(false)
-  const supabase = createClient()
 
   useEffect(() => {
-    if (member) {
-      const familyData = member.family_members as FamilyMember[]
-      setFamilyMembers(familyData || [])
-      fetchEvents()
-      fetchFamilyRegistrations()
-      setLoading(false)
+    if (!loading) {
+      if (!user) {
+        router.push('/login')
+      } else if (!isMember) {
+        router.push('/admin')
+      } else if (member) {
+        const familyData = member.family_members as MockFamilyMember[]
+        setFamilyMembers(familyData || [])
+        fetchEvents()
+        fetchFamilyRegistrations()
+        setPageLoading(false)
+      }
     }
-  }, [member])
+  }, [user, member, loading, isMember, router])
 
   const fetchEvents = async () => {
-    const { data, error } = await supabase
-      .from('events')
-      .select('*')
-      .gte('date', new Date().toISOString().split('T')[0])
-      .order('date', { ascending: true })
-
-    if (data && !error) {
-      setEvents(data)
-    }
+    // Simulate loading delay
+    await new Promise(resolve => setTimeout(resolve, 300))
+    const eventData = MockEventsService.getEvents()
+    setEvents(eventData)
   }
 
   const fetchFamilyRegistrations = async () => {
     if (!user) return
 
-    const { data, error } = await supabase
-      .from('registrations')
-      .select('*')
-      .eq('member_id', user.id)
-
-    if (data && !error) {
-      setFamilyRegistrations(data)
-    }
+    const registrationData = MockRegistrationsService.getRegistrations(user.id)
+    setFamilyRegistrations(registrationData)
   }
 
-  const saveFamilyMembers = async (updatedMembers: FamilyMember[]) => {
-    if (!user) return
+  const saveFamilyMembers = async (updatedMembers: MockFamilyMember[]) => {
+    if (!user || !member) return
 
-    const { error } = await supabase
-      .from('members')
-      .update({ family_members: updatedMembers })
-      .eq('id', user.id)
-
-    if (error) {
-      console.error('Error updating family members:', error)
-    } else {
-      setFamilyMembers(updatedMembers)
-    }
+    const updatedMember = { ...member, family_members: updatedMembers }
+    MockAuthService.updateMember(updatedMember)
+    setFamilyMembers(updatedMembers)
   }
 
-  const addFamilyMember = async (newMember: FamilyMember) => {
+  const addFamilyMember = async (newMember: MockFamilyMember) => {
     const updatedMembers = [...familyMembers, newMember]
     await saveFamilyMembers(updatedMembers)
     setShowAddForm(false)
   }
 
-  const updateFamilyMember = async (index: number, updatedMember: FamilyMember) => {
+  const updateFamilyMember = async (index: number, updatedMember: MockFamilyMember) => {
     const updatedMembers = [...familyMembers]
     updatedMembers[index] = updatedMember
     await saveFamilyMembers(updatedMembers)
@@ -91,7 +80,7 @@ export default function FamilyPage() {
     return familyRegistrations.some(reg => reg.event_id === eventId)
   }
 
-  const registerForEvent = (event: Event) => {
+  const registerForEvent = (event: MockEvent) => {
     if (event.registration_url) {
       window.open(event.registration_url, '_blank')
     }
@@ -113,7 +102,7 @@ export default function FamilyPage() {
     })
   }
 
-  if (loading) {
+  if (loading || pageLoading || !user || !isMember) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
@@ -292,10 +281,10 @@ function AddFamilyMemberForm({
   onAdd, 
   onCancel 
 }: { 
-  onAdd: (member: FamilyMember) => void
+  onAdd: (member: MockFamilyMember) => void
   onCancel: () => void 
 }) {
-  const [formData, setFormData] = useState<FamilyMember>({
+  const [formData, setFormData] = useState<MockFamilyMember>({
     name: '',
     age: 0,
     relationship: '',
@@ -408,11 +397,11 @@ function EditFamilyMemberForm({
   onSave, 
   onCancel 
 }: { 
-  member: FamilyMember
-  onSave: (member: FamilyMember) => void
+  member: MockFamilyMember
+  onSave: (member: MockFamilyMember) => void
   onCancel: () => void 
 }) {
-  const [formData, setFormData] = useState<FamilyMember>(member)
+  const [formData, setFormData] = useState<MockFamilyMember>(member)
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()

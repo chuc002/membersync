@@ -1,20 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { IHCCEventScraper } from '@/lib/ihcc-scraper'
+import { mockEvents } from '@/lib/mock/data'
 
 export async function POST(request: NextRequest) {
   try {
-    // Verify the request is authenticated (you might want to add API key validation)
-    const authHeader = request.headers.get('authorization')
-    if (!authHeader || authHeader !== `Bearer ${process.env.SYNC_API_KEY}`) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    const scraper = new IHCCEventScraper()
-    await scraper.syncEventsToDatabase()
-
+    // Mock sync - return success for demo
+    console.log('📅 Mock: Events sync completed')
+    
     return NextResponse.json({ 
       success: true, 
-      message: 'Events synced successfully',
+      message: 'Mock: Events synced successfully',
+      eventsProcessed: mockEvents.length,
       timestamp: new Date().toISOString()
     })
   } catch (error) {
@@ -28,13 +23,12 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
-    const scraper = new IHCCEventScraper()
-    const events = await scraper.scrapeEvents()
-
+    // Return mock events for demo
     return NextResponse.json({ 
       success: true, 
-      events,
-      count: events.length,
+      events: mockEvents,
+      count: mockEvents.length,
+      mode: 'demo',
       timestamp: new Date().toISOString()
     })
   } catch (error) {

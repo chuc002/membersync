@@ -1,14 +1,15 @@
 'use client'
 
 import { createContext, useContext, useEffect, useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
-import type { User } from '@supabase/supabase-js'
-import type { Member } from '@/lib/types/database'
+import { MockAuthService } from '@/lib/mock/services'
+import type { MockMember } from '@/lib/mock/data'
 
 type AuthContextType = {
-  user: User | null
-  member: Member | null
+  user: any | null
+  member: MockMember | null
   loading: boolean
+  isAdmin: boolean
+  isMember: boolean
   signOut: () => Promise<void>
 }
 
@@ -16,6 +17,8 @@ const AuthContext = createContext<AuthContextType>({
   user: null,
   member: null,
   loading: true,
+  isAdmin: false,
+  isMember: false,
   signOut: async () => {},
 })
 
@@ -28,66 +31,62 @@ export const useAuth = () => {
 }
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null)
-  const [member, setMember] = useState<Member | null>(null)
+  const [user, setUser] = useState<any | null>(null)
+  const [member, setMember] = useState<MockMember | null>(null)
   const [loading, setLoading] = useState(true)
-  const supabase = createClient()
+  const [isAdmin, setIsAdmin] = useState(false)
+  const [isMember, setIsMember] = useState(false)
+
+  const updateAuthState = () => {
+    const currentMember = MockAuthService.getCurrentUser()
+    if (currentMember) {
+      setUser({ id: currentMember.id, email: currentMember.email })
+      setMember(currentMember)
+      setIsAdmin(currentMember.role === 'admin')
+      setIsMember(currentMember.role === 'member')
+    } else {
+      setUser(null)
+      setMember(null)
+      setIsAdmin(false)
+      setIsMember(false)
+    }
+  }
 
   useEffect(() => {
-    // Get initial session
-    const getInitialSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession()
-      setUser(session?.user ?? null)
-      
-      if (session?.user) {
-        // Fetch member profile
-        const { data: memberData } = await supabase
-          .from('members')
-          .select('*')
-          .eq('id', session.user.id)
-          .single()
-        
-        setMember(memberData)
-      }
-      
-      setLoading(false)
+    // Get current user from localStorage
+    updateAuthState()
+    setLoading(false)
+
+    // Listen for storage changes (for cross-tab sync)
+    const handleStorageChange = () => {
+      updateAuthState()
     }
 
-    getInitialSession()
+    // Listen for custom auth events (for same-tab updates)
+    const handleAuthChange = () => {
+      updateAuthState()
+    }
 
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        setUser(session?.user ?? null)
-        
-        if (session?.user) {
-          // Fetch member profile
-          const { data: memberData } = await supabase
-            .from('members')
-            .select('*')
-            .eq('id', session.user.id)
-            .single()
-          
-          setMember(memberData)
-        } else {
-          setMember(null)
-        }
-        
-        setLoading(false)
-      }
-    )
-
-    return () => subscription.unsubscribe()
-  }, [supabase])
+    window.addEventListener('storage', handleStorageChange)
+    window.addEventListener('authStateChanged', handleAuthChange)
+    return () => {
+      window.removeEventListener('storage', handleStorageChange)
+      window.removeEventListener('authStateChanged', handleAuthChange)
+    }
+  }, [])
 
   const signOut = async () => {
-    await supabase.auth.signOut()
+    await MockAuthService.signOut()
     setUser(null)
     setMember(null)
+    setIsAdmin(false)
+    setIsMember(false)
+    // Trigger auth state change event
+    window.dispatchEvent(new Event('authStateChanged'))
   }
 
   return (
-    <AuthContext.Provider value={{ user, member, loading, signOut }}>
+    <AuthContext.Provider value={{ user, member, loading, isAdmin, isMember, signOut }}>
       {children}
     </AuthContext.Provider>
   )

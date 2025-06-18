@@ -1,24 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { IHCCEventScraper } from '@/lib/ihcc-scraper'
 
 export async function GET(request: NextRequest) {
   try {
-    // Verify the request is from Vercel Cron or has valid API key
-    const authHeader = request.headers.get('authorization')
-    const cronSecret = request.headers.get('x-vercel-cron-signature')
+    console.log('🕒 Mock: Starting automated event sync...')
     
-    if (!cronSecret && (!authHeader || authHeader !== `Bearer ${process.env.SYNC_API_KEY}`)) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    console.log('Starting automated event sync...')
-    
-    const scraper = new IHCCEventScraper()
-    await scraper.syncEventsToDatabase()
-
+    // Mock cron job - return success for demo
     return NextResponse.json({
       success: true,
-      message: 'Events synced successfully via cron job',
+      message: 'Mock: Events synced successfully via cron job',
+      mode: 'demo',
       timestamp: new Date().toISOString(),
     })
   } catch (error) {

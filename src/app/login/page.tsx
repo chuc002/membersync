@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
+import { MockAuthService } from '@/lib/mock/services'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 
@@ -12,7 +12,6 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const router = useRouter()
-  const supabase = createClient()
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -20,20 +19,19 @@ export default function LoginPage() {
     setError('')
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      })
+      const { user, error } = await MockAuthService.signIn(email, password)
 
       if (error) {
-        setError(error.message)
-      } else {
-        router.push('/dashboard')
-        router.refresh()
+        setError(error)
+        setLoading(false)
+      } else if (user) {
+        // Wait a bit for auth state to update, then redirect
+        setTimeout(() => {
+          window.location.href = '/dashboard'
+        }, 100)
       }
     } catch (err) {
       setError('An unexpected error occurred')
-    } finally {
       setLoading(false)
     }
   }
@@ -45,12 +43,10 @@ export default function LoginPage() {
     }
 
     setLoading(true)
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/reset-password`,
-    })
+    const { error } = await MockAuthService.resetPassword(email)
 
     if (error) {
-      setError(error.message)
+      setError(error)
     } else {
       setError('Password reset email sent! Check your inbox.')
     }

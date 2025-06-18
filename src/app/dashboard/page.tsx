@@ -2,8 +2,11 @@
 
 import { useState, useEffect } from 'react'
 import { useAuth } from '@/components/AuthProvider'
-import { createClient } from '@/lib/supabase/client'
-import type { Event, Registration, EventCategory } from '@/lib/types/database'
+import { useRouter } from 'next/navigation'
+import { MockEventsService, MockRegistrationsService, MockNotificationsService } from '@/lib/mock/services'
+import type { MockEvent, MockRegistration } from '@/lib/mock/data'
+
+type EventCategory = 'Golf' | 'Dining' | 'Kids' | 'Fitness' | 'Social'
 
 const categoryColors: Record<EventCategory, string> = {
   Golf: 'bg-green-100 text-green-800',
@@ -14,20 +17,27 @@ const categoryColors: Record<EventCategory, string> = {
 }
 
 export default function DashboardPage() {
-  const { user, member, signOut } = useAuth()
-  const [events, setEvents] = useState<Event[]>([])
-  const [registrations, setRegistrations] = useState<Registration[]>([])
-  const [filteredEvents, setFilteredEvents] = useState<Event[]>([])
+  const { user, member, signOut, loading, isMember } = useAuth()
+  const router = useRouter()
+  const [events, setEvents] = useState<MockEvent[]>([])
+  const [registrations, setRegistrations] = useState<MockRegistration[]>([])
+  const [filteredEvents, setFilteredEvents] = useState<MockEvent[]>([])
   const [selectedCategories, setSelectedCategories] = useState<Set<EventCategory>>(new Set())
-  const [loading, setLoading] = useState(true)
-  const supabase = createClient()
+  const [eventsLoading, setEventsLoading] = useState(true)
 
   useEffect(() => {
-    if (user) {
-      fetchEvents()
-      fetchRegistrations()
+    if (!loading) {
+      if (!user) {
+        router.push('/login')
+      } else if (!isMember) {
+        router.push('/admin') // Redirect admins to admin dashboard
+      } else {
+        // Load member data
+        fetchEvents()
+        fetchRegistrations()
+      }
     }
-  }, [user])
+  }, [user, loading, isMember, router])
 
   useEffect(() => {
     if (selectedCategories.size === 0) {
@@ -40,29 +50,25 @@ export default function DashboardPage() {
   }, [events, selectedCategories])
 
   const fetchEvents = async () => {
-    const { data, error } = await supabase
-      .from('events')
-      .select('*')
-      .gte('date', new Date().toISOString().split('T')[0])
-      .order('date', { ascending: true })
-
-    if (data && !error) {
-      setEvents(data)
+    try {
+      // Simulate loading delay
+      await new Promise(resolve => setTimeout(resolve, 300))
+      
+      const eventData = MockEventsService.getEvents()
+      console.log('Loaded events:', eventData.length)
+      setEvents(eventData)
+      setEventsLoading(false)
+    } catch (error) {
+      console.error('Error loading events:', error)
+      setEventsLoading(false)
     }
-    setLoading(false)
   }
 
   const fetchRegistrations = async () => {
     if (!user) return
 
-    const { data, error } = await supabase
-      .from('registrations')
-      .select('*')
-      .eq('member_id', user.id)
-
-    if (data && !error) {
-      setRegistrations(data)
-    }
+    const registrationData = MockRegistrationsService.getRegistrations(user.id)
+    setRegistrations(registrationData)
   }
 
   const toggleCategory = (category: EventCategory) => {
@@ -76,23 +82,15 @@ export default function DashboardPage() {
   }
 
   const getRecommendedEvents = () => {
-    // Simple recommendation based on member preferences
-    const memberPreferences = member?.preferences as any
-    const preferredCategories = memberPreferences?.categories || []
-    
-    return events
-      .filter(event => 
-        preferredCategories.includes(event.category) || 
-        (memberPreferences?.familyEvents && event.category === 'Kids')
-      )
-      .slice(0, 5)
+    if (!member) return []
+    return MockEventsService.getRecommendedEvents(member)
   }
 
   const isRegistered = (eventId: string) => {
     return registrations.some(reg => reg.event_id === eventId)
   }
 
-  const handleRegister = (event: Event) => {
+  const handleRegister = (event: MockEvent) => {
     if (event.registration_url) {
       window.open(event.registration_url, '_blank')
     }
@@ -115,7 +113,7 @@ export default function DashboardPage() {
     })
   }
 
-  if (loading) {
+  if (loading || !user || !isMember) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
@@ -139,7 +137,13 @@ export default function DashboardPage() {
             </div>
             <div className="flex items-center space-x-4">
               <button
-                onClick={() => window.location.href = '/family'}
+                onClick={() => router.push('/profile')}
+                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+              >
+                Profile
+              </button>
+              <button
+                onClick={() => router.push('/family')}
                 className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
               >
                 Family
