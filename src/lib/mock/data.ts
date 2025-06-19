@@ -36,9 +36,8 @@ export interface MockEvent {
   time: string
   category: string
   price: number
-  registration_url: string
-  club_id: string
-  created_at: string
+  location: string
+  url: string
 }
 
 export interface MockRegistration {
@@ -49,129 +48,213 @@ export interface MockRegistration {
   registered_at: string
 }
 
-// Mock Events Data
+// Real IHCC Events Data - Imported from CSV
 export const mockEvents: MockEvent[] = [
   {
-    id: '1',
-    title: 'Golf Tournament - Member Guest',
-    description: 'Annual member-guest golf tournament with prizes and dinner. Join us for a day of friendly competition on our championship course.',
-    date: '2025-07-25',
-    time: '08:00:00',
-    category: 'Golf',
-    price: 125.00,
-    registration_url: 'https://www.ihcckc.com/default.aspx?p=.NETEventView&ID=3844355',
-    club_id: 'IHCC',
-    created_at: '2024-12-18T00:00:00Z'
-  },
-  {
-    id: '2',
-    title: 'Wine Tasting Dinner',
-    description: 'Five-course dinner paired with premium wines from Napa Valley. An evening of culinary excellence.',
-    date: '2025-07-28',
-    time: '18:30:00',
-    category: 'Dining',
-    price: 89.00,
-    registration_url: 'https://www.ihcckc.com/default.aspx?p=.NETEventView&ID=3844356',
-    club_id: 'IHCC',
-    created_at: '2024-12-18T00:00:00Z'
-  },
-  {
-    id: '3',
-    title: 'Kids Swimming Lessons',
-    description: 'Learn to swim program for children ages 5-12. Professional instruction in our heated indoor pool.',
-    date: '2025-07-30',
-    time: '16:00:00',
-    category: 'Kids',
-    price: 45.00,
-    registration_url: 'https://www.ihcckc.com/default.aspx?p=.NETEventView&ID=3844357',
-    club_id: 'IHCC',
-    created_at: '2024-12-18T00:00:00Z'
-  },
-  {
-    id: '4',
-    title: 'Fitness Boot Camp',
-    description: 'High-intensity interval training session led by certified trainers. All fitness levels welcome.',
-    date: '2025-08-02',
-    time: '06:00:00',
+    id: 'ihcc-1',
+    title: 'WoW Day #2 5:15 AM',
+    description: 'Women on Weights is a strength training program targeting women of all levels, get stronger together! Spaces are limited and you must be registered. This 8-week program includes: pre-and post-assessment • 60-minute Strength Training 2x\'s / week Led by IHCC personal trainer • Group Class of choice 2x\'s / week • Individualized macronutrient plan • Tracking card for accountability.',
+    date: '6-20-2025',
+    time: '5:15AM',
     category: 'Fitness',
-    price: 25.00,
-    registration_url: 'https://www.ihcckc.com/default.aspx?p=.NETEventView&ID=3844358',
-    club_id: 'IHCC',
-    created_at: '2024-12-18T00:00:00Z'
+    price: 20,
+    location: 'Indian Hills CC',
+    url: 'https://www.ihcckc.com/events/wow-day-2-5-15-am'
   },
   {
-    id: '5',
-    title: 'New Year Social Mixer',
-    description: 'Welcome the new year with fellow members. Cocktails, appetizers, and live music.',
-    date: '2025-08-05',
-    time: '19:00:00',
-    category: 'Social',
-    price: 35.00,
-    registration_url: 'https://www.ihcckc.com/default.aspx?p=.NETEventView&ID=3844359',
-    club_id: 'IHCC',
-    created_at: '2024-12-18T00:00:00Z'
-  },
-  {
-    id: '6',
-    title: 'Ladies Golf Clinic',
-    description: 'Improve your golf game with professional instruction. Beginner to intermediate levels.',
-    date: '2025-08-08',
-    time: '10:00:00',
-    category: 'Golf',
-    price: 65.00,
-    registration_url: 'https://www.ihcckc.com/default.aspx?p=.NETEventView&ID=3844360',
-    club_id: 'IHCC',
-    created_at: '2024-12-18T00:00:00Z'
-  },
-  {
-    id: '7',
-    title: 'Valentine\'s Day Dinner',
-    description: 'Romantic dinner for couples featuring a special menu and live piano music.',
-    date: '2025-08-14',
-    time: '18:00:00',
-    category: 'Dining',
-    price: 95.00,
-    registration_url: 'https://www.ihcckc.com/default.aspx?p=.NETEventView&ID=3844361',
-    club_id: 'IHCC',
-    created_at: '2024-12-18T00:00:00Z'
-  },
-  {
-    id: '8',
-    title: 'Kids Art Workshop',
-    description: 'Creative art activities for children. All supplies provided. Perfect for budding artists.',
-    date: '2025-08-17',
-    time: '14:00:00',
-    category: 'Kids',
-    price: 20.00,
-    registration_url: 'https://www.ihcckc.com/default.aspx?p=.NETEventView&ID=3844362',
-    club_id: 'IHCC',
-    created_at: '2024-12-18T00:00:00Z'
-  },
-  {
-    id: '9',
-    title: 'Tennis Championship',
-    description: 'Annual tennis tournament open to all skill levels. Trophies for winners in each division.',
-    date: '2025-08-15',
-    time: '09:00:00',
+    id: 'ihcc-2',
+    title: 'WoW Day #2 6:00 AM',
+    description: 'Women on Weights is a strength training program targeting women of all levels, get stronger together! Spaces are limited and you must be registered. This 8-week program includes: pre-and post-assessment • 60-minute Strength Training 2x\'s / week Led by IHCC personal trainer • Group Class of choice 2x\'s / week • Individualized macronutrient plan • Tracking card for accountability.',
+    date: '6-20-2025',
+    time: '6:00AM',
     category: 'Fitness',
-    price: 40.00,
-    registration_url: 'https://www.ihcckc.com/default.aspx?p=.NETEventView&ID=3844363',
-    club_id: 'IHCC',
-    created_at: '2024-12-18T00:00:00Z'
+    price: 20,
+    location: 'Indian Hills CC',
+    url: 'https://www.ihcckc.com/events/wow-day-2-6-00-am'
   },
   {
-    id: '10',
-    title: 'Cocktail Making Class',
-    description: 'Learn to craft professional cocktails from our expert bartenders. Recipe cards included.',
-    date: '2025-08-20',
-    time: '17:00:00',
-    category: 'Social',
-    price: 55.00,
-    registration_url: 'https://www.ihcckc.com/default.aspx?p=.NETEventView&ID=3844364',
-    club_id: 'IHCC',
-    created_at: '2024-12-18T00:00:00Z'
+    id: 'ihcc-3',
+    title: 'Cardio Sculpt 7:00 AM',
+    description: 'A great way to sweat and sculpt while building aerobic capacity. The exercises will keep you moving, sweating, and having fun!',
+    date: '6-20-2025',
+    time: '7:00AM',
+    category: 'Fitness',
+    price: 15,
+    location: 'Indian Hills CC',
+    url: 'https://www.ihcckc.com/events/cardio-sculpt-7-00-am'
+  },
+  {
+    id: 'ihcc-4',
+    title: 'Deep H2O Conditioning (@ the pool) 7:00 AM',
+    description: 'Build power, strength, flexibility, balance, and mobility through leveraged body weight exercise.',
+    date: '6-20-2025',
+    time: '7:00AM',
+    category: 'Fitness',
+    price: 18,
+    location: 'Indian Hills CC',
+    url: 'https://www.ihcckc.com/events/deep-h2o-conditioning-@-the-pool-7-00-am'
+  },
+  {
+    id: 'ihcc-5',
+    title: '8am Cardio Clinic',
+    description: 'High-intensity cardio workout session designed to boost your cardiovascular fitness and energy levels.',
+    date: '6-20-2025',
+    time: '8:00AM',
+    category: 'Fitness',
+    price: 12,
+    location: 'Indian Hills CC',
+    url: 'https://www.ihcckc.com/events/8am-cardio-clinic'
+  },
+  {
+    id: 'ihcc-6',
+    title: 'Barre Fitness 8:30 AM',
+    description: 'A low-impact workout focuses on isometric exercises that will strengthen your legs, core, and back while improving your posture and flexibility.',
+    date: '6-20-2025',
+    time: '8:30AM',
+    category: 'Fitness',
+    price: 22,
+    location: 'Indian Hills CC',
+    url: 'https://www.ihcckc.com/events/barre-fitness-8-30-am'
+  },
+  {
+    id: 'ihcc-7',
+    title: '9am Cardio Clinic',
+    description: 'Morning cardio session to start your day with energy and motivation. Perfect for all fitness levels.',
+    date: '6-20-2025',
+    time: '9:00AM',
+    category: 'Fitness',
+    price: 12,
+    location: 'Indian Hills CC',
+    url: 'https://www.ihcckc.com/events/9am-cardio-clinic'
+  },
+  {
+    id: 'ihcc-8',
+    title: 'Tennis Ball Foot Massage Mini-Clinic',
+    description: 'Complimentary mini-clinic on the Tennis Deck! Learn self-massage techniques for foot relief and wellness.',
+    date: '6-20-2025',
+    time: '9:00AM',
+    category: 'Fitness',
+    price: 0,
+    location: 'Indian Hills CC',
+    url: 'https://www.ihcckc.com/events/tennis-ball-foot-massage-mini-clinic'
+  },
+  {
+    id: 'ihcc-9',
+    title: 'WoW Day #2 11:00 AM',
+    description: 'Women on Weights is a strength training program targeting women of all levels, get stronger together! Spaces are limited and you must be registered. This 8-week program includes: pre-and post-assessment • 60-minute Strength Training 2x\'s / week Led by IHCC personal trainer • Group Class of choice 2x\'s / week.',
+    date: '6-20-2025',
+    time: '11:00AM',
+    category: 'Fitness',
+    price: 20,
+    location: 'Indian Hills CC',
+    url: 'https://www.ihcckc.com/events/wow-day-2-11-00-am'
+  },
+  {
+    id: 'ihcc-10',
+    title: 'Jr. Tennis Member-Guest',
+    description: 'Invite a friend for tennis, pizza, drinks, and prizes! $25++ per person',
+    date: '6-20-2025',
+    time: '6:00PM',
+    category: 'Kids',
+    price: 25,
+    location: 'Indian Hills CC',
+    url: 'https://www.ihcckc.com/events/jr-tennis-member-guest'
+  },
+  {
+    id: 'ihcc-11',
+    title: '8:30 am Cardio Clinic',
+    description: 'Extended morning cardio session to energize your weekend. Great for building endurance and cardiovascular health.',
+    date: '6-21-2025',
+    time: '8:30AM',
+    category: 'Fitness',
+    price: 12,
+    location: 'Indian Hills CC',
+    url: 'https://www.ihcckc.com/events/8-30-am-cardio-clinic'
+  },
+  {
+    id: 'ihcc-12',
+    title: 'Circuit Training 8:30 AM',
+    description: 'A metabolism boosting workout utilizing multiple joint movements and full body exercises performed at a high intensity, formatted in a circuit style class. The exercises are constantly changing, forcing you to use your whole body as a unit.',
+    date: '6-21-2025',
+    time: '8:30AM',
+    category: 'Fitness',
+    price: 18,
+    location: 'Indian Hills CC',
+    url: 'https://www.ihcckc.com/events/circuit-training-8-30-am'
+  },
+  {
+    id: 'ihcc-13',
+    title: 'AQUA FIT (@ the pool) 9:00 AM',
+    description: 'Build power, strength, flexibility, balance, and mobility through leveraged body weight exercise in the pool.',
+    date: '6-22-2025',
+    time: '9:00AM',
+    category: 'Fitness',
+    price: 15,
+    location: 'Indian Hills CC',
+    url: 'https://www.ihcckc.com/events/aqua-fit-@-the-pool-9-00-am'
+  },
+  {
+    id: 'ihcc-14',
+    title: 'Father-Son Night of Fun!',
+    description: 'Dads and sons, join us for laser tag, zorb ball bowling, sumo suit wrestling, food, and fun! Dads - $45 and Sons - $30',
+    date: '6-22-2025',
+    time: '5:00PM',
+    category: 'Kids',
+    price: 45,
+    location: 'Indian Hills CC',
+    url: 'https://www.ihcckc.com/events/father-son-night-of-fun'
+  },
+  {
+    id: 'ihcc-15',
+    title: 'WoW Day #1 5:30 AM',
+    description: 'Women on Weights is a strength training program targeting women of all levels, get stronger together! Spaces are limited and you must be registered. This 8-week program includes: pre-and post-assessment • 60-minute Strength Training 2x\'s / week Led by IHCC personal trainer.',
+    date: '6-23-2025',
+    time: '5:30AM',
+    category: 'Fitness',
+    price: 20,
+    location: 'Indian Hills CC',
+    url: 'https://www.ihcckc.com/events/wow-day-1-5-30-am'
+  },
+  {
+    id: 'ihcc-16',
+    title: 'Circuit Training 7:00 AM',
+    description: 'A metabolism boosting workout utilizing multiple joint movements and full body exercises performed at a high intensity, formatted in a circuit style class. The exercises are constantly changing, forcing you to use your whole body as a unit.',
+    date: '6-23-2025',
+    time: '7:00AM',
+    category: 'Fitness',
+    price: 18,
+    location: 'Indian Hills CC',
+    url: 'https://www.ihcckc.com/events/circuit-training-7-00-am'
+  },
+  {
+    id: 'ihcc-17',
+    title: 'Deep H2O Conditioning (@ the pool) 7:00 AM',
+    description: 'Build power, strength, flexibility, balance, and mobility through leveraged body weight exercise in our pool facilities.',
+    date: '6-23-2025',
+    time: '7:00AM',
+    category: 'Fitness',
+    price: 18,
+    location: 'Indian Hills CC',
+    url: 'https://www.ihcckc.com/events/deep-h2o-conditioning-@-the-pool-7-00-am'
+  },
+  {
+    id: 'ihcc-18',
+    title: 'Body Sculpt 8:30 AM',
+    description: 'A great way to define, sculpt, and build lean muscle. Focuses on strength training with isolation exercises using free weights, resistance bands, medicine balls, ending with core strength.',
+    date: '6-23-2025',
+    time: '8:30AM',
+    category: 'Fitness',
+    price: 20,
+    location: 'Indian Hills CC',
+    url: 'https://www.ihcckc.com/events/body-sculpt-8-30-am'
   }
 ]
+
+// Utility function to get events by category for filtering
+export const getEventsByCategory = (category: string): MockEvent[] => {
+  if (category === 'all') return mockEvents
+  return mockEvents.filter(event => event.category.toLowerCase() === category.toLowerCase())
+}
 
 // Pre-defined demo users
 export const demoUsers: MockMember[] = [
